@@ -1,22 +1,22 @@
-# Vaprobash
+# VaprobashCentOS
 
 **Va**grant **Pro**visioning **Bash** Scripts
 
-[View the site and extended docs.](http://fideloper.github.io/Vaprobash/index.html)
 
-[![Build Status](https://travis-ci.org/fideloper/Vaprobash.png?branch=master)](https://travis-ci.org/fideloper/Vaprobash)
+
 
 ## Goal
 
 The goal of this project is to create easy to use bash scripts in order to provision a Vagrant server.
 
-1. This targets Ubuntu LTS releases, currently 12.04.*
+1. This targets CentOS release, currently 6.5
 2. This project will give users various popular options such as LAMP, LEMP
 3. This project will attempt some modularity. For example, users might choose to install a Vim setup, or not.
 
 Some further assumptions and self-imposed restrictions. If you find yourself needing or wanting the following, then other provisioning tool would better suited ([Chef](http://www.getchef.com), [Puppet](http://puppetlabs.com), [Ansible](http://www.ansibleworks.com)).
 
-* If other OSes need to be used (CentOS, Redhat, Arch, etc).
+* For Ubuntu, see the original Vaprobash
+* If other OSes need to be used (Arch, etc).
 * If dependency management becomes complex. For example, installing Laravel depends on Composer. Setting a document root for a project will change depending on Nginx or Apache. Currently, these dependencies are accounted for, but more advanced dependencies will likely not be.
 
 ## Dependencies
@@ -27,17 +27,7 @@ Some further assumptions and self-imposed restrictions. If you find yourself nee
 
 ## Instructions
 
-**First**, Copy the Vagrantfile from this repo. You may wish to use curl or wget to do this instead of cloning the repository.
-
-```bash
-# curl
-$ curl -L http://bit.ly/vaprobash > Vagrantfile
-
-# wget
-$ wget -O Vagrantfile http://bit.ly/vaprobash
-```
-
-> The `bit.ly` link will always point to the master branch version of the Vagrantfile.
+**First**, Copy the Vagrantfile from this repo. 
 
 **Second**, edit the `Vagrantfile` and uncomment which scripts you'd like to run. You can uncomment them by removing the `#` character before the `config.vm.provision` line.
 
@@ -68,43 +58,45 @@ Here's a quickstart screencast!
 [View the site and extended docs.](http://fideloper.github.io/Vaprobash/index.html)
 
 ## What You Can Install
+>~~Strikethrough~~ packages have not been implemented for CentOS yet.
+
 
 * Base Packages
 	* Base Items (Git and more!)
-	* Oh-My-ZSH
+	* ~~Oh-My-ZSH~~
 	* PHP (php-fpm)
-	* Vim
-	* PHP MsSQL (ability to connect to SQL Server)
-	* Screen
+	* ~~Vim~~
+	* ~~PHP MsSQL (ability to connect to SQL Server)~~
+	* ~~Screen~~
 * Web Servers
 	* Apache
-	* HHVM
-	* Nginx
+	* ~~HHVM~~
+	* ~~Nginx~~
 * Databases
-	* Couchbase
-	* CouchDB
-	* MariaDB
-	* MongoDB
+	* ~~Couchbase~~
+	* ~~CouchDB~~
+	* ~~MariaDB~~
+	* ~~MongoDB~~
 	* MySQL
-	* PostgreSQL
-	* SQLite
+	* ~~PostgreSQL~~
+	* ~~SQLite~~
 * In-Memory Stores
-	* Memcached
-	* Redis
+	* ~~Memcached~~
+	* ~~Redis~~
 * Search
-	* ElasticSearch and ElasticHQ
+	* ~~ElasticSearch and ElasticHQ~~
 * Utility
-	* Beanstalkd
-	* Supervisord
+	* ~~Beanstalkd~~
+	* ~~Supervisord~~
 * Additional Languages
-	* NodeJS via NVM
-	* Ruby via RVM
+	* ~~NodeJS via NVM~~
+	* ~~Ruby via RVM~~
 * Frameworks / Tooling
 	* Composer
 	* Laravel
-	* Symfony
-	* PHPUnit
-	* MailCatcher
+	* ~~Symfony~~
+	* ~~PHPUnit~~
+	* ~~MailCatcher~~
 
 ## The Vagrantfile
 
@@ -119,16 +111,4 @@ The vagrant file does three things you should take note of:
             :nfs => true,
             :mount_options => ['nolock,vers=3,udp,noatime']
   ```
-3. **Offers an option to prevent the virtual machine from losing internet connection when running on Ubuntu.** If your virtual machine can't access the internet, you can solve this problem by uncommenting the two lines below:
 
-  ```ruby
-    #vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-    #vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-  ```
-
-  Don't forget to reload your Vagrantfile running `vagrant reload --no-provision`, in case your virtual machine already exists.
-
-
-## Contribute!
-
-Do it! Any new install or improvement on existing ones are welcome! Please see the [contributing doc](/contributing.md), which only asks that pull requests be made to the `develop` branch.

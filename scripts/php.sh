@@ -1,33 +1,33 @@
 #!/usr/bin/env bash
 
 if [ -z "$1" ]; then
-    php_version="distributed"
+    php_version="latest"
 else
     php_version="$1"
 fi
 
 echo ">>> Installing PHP $1 version"
 
-if [ $php_version == "latest" ]; then
-    sudo add-apt-repository -y ppa:ondrej/php5
-fi
 
-if [ $php_version == "previous" ]; then
-    sudo add-apt-repository -y ppa:ondrej/php5-oldstable
-fi
-
-sudo apt-get update
+sudo yum update -y
 
 # Install PHP
-sudo apt-get install -y php5-cli php5-fpm php5-mysql php5-pgsql php5-sqlite php5-curl php5-gd php5-gmp php5-mcrypt php5-xdebug php5-memcached php5-imagick php5-intl
+sudo yum --enablerepo=remi,remi-php55,remi-test install -y php-cli php-devel php-fpm php-pear php-mysqlnd php-pgsql php-sqlite php-curl php-gd php-gmp php-mcrypt php-memcached php-intl
+
+sudo yum install -y ImageMagick ImageMagick-devel ImageMagick-perl
+printf "\n" | sudo pecl install imagick
+
+sudo bash -c 'echo extension=imagick.so >> /etc/php.ini'
+
+sudo pecl install Xdebug
 
 # xdebug Config
-cat > $(find /etc/php5 -name xdebug.ini) << EOF
-zend_extension=$(find /usr/lib/php5 -name xdebug.so)
+sudo bash -c 'cat > /etc/php.d/xdebug.ini << EOF
+zend_extension=$(find /usr/lib64/php -name xdebug.so)
 xdebug.remote_enable = 1
 xdebug.remote_connect_back = 1
 xdebug.remote_port = 9000
-xdebug.scream=1
+xdebug.scream=0
 xdebug.cli_color=1
 xdebug.show_local_vars=1
 
@@ -35,20 +35,14 @@ xdebug.show_local_vars=1
 xdebug.var_display_max_depth = 5
 xdebug.var_display_max_children = 256
 xdebug.var_display_max_data = 1024
-EOF
+EOF'
 
 # PHP Error Reporting Config
-sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php5/fpm/php.ini
-sed -i "s/display_errors = .*/display_errors = On/" /etc/php5/fpm/php.ini
-sed -i "s/html_errors = .*/html_errors = On/" /etc/php5/fpm/php.ini
+sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php.ini
+sudo sed -i "s/display_errors = .*/display_errors = On/" /etc/php.ini
+sudo sed -i "s/html_errors = .*/html_errors = On/" /etc/php.ini
 
 # PHP Date Timezone
-sed -i "s/;date.timezone =.*/date.timezone = ${2/\//\\/}/" /etc/php5/fpm/php.ini
-sed -i "s/;date.timezone =.*/date.timezone = ${2/\//\\/}/" /etc/php5/cli/php.ini
+sudo sed -i "s/;date.timezone =.*/date.timezone = ${2/\//\\/}/" /etc/php.ini
 
-# Make sure php5-fpm is running as a Unix socket on "distributed" version
-if [ $php_version == "distributed" ]; then
-    sed -i "s/listen = .*/listen = \/var\/run\/php5-fpm.sock/" /etc/php5/fpm/pool.d/www.conf
-fi
-
-sudo service php5-fpm restart
+sudo service php-fpm restart

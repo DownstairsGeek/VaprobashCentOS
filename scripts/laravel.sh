@@ -8,9 +8,6 @@ php -v > /dev/null 2>&1 || { printf "!!! PHP is not installed.\n    Installing L
 # Test if Composer is installed
 composer -v > /dev/null 2>&1 || { printf "!!! Composer is not installed.\n    Installing Laravel aborted!\n"; exit 0; }
 
-# Test if Composer is installed
-composer -v > /dev/null 2>&1 || { printf "!!! Composer is not installed.\n    Installing Laravel aborted!"; exit 0; }
-
 # Test if Server IP is set in Vagrantfile
 [[ -z "$1" ]] && { printf "!!! IP address not set. Check the Vagrantfile.\n    Installing Laravel aborted!\n"; exit 0; }
 
@@ -35,7 +32,7 @@ HHVM_IS_INSTALLED=$?
 nginx -v > /dev/null 2>&1
 NGINX_IS_INSTALLED=$?
 
-apache2 -v > /dev/null 2>&1
+sudo service httpd status > /dev/null 2>&1
 APACHE_IS_INSTALLED=$?
 
 # Create Laravel folder if needed
@@ -74,9 +71,9 @@ if [ $NGINX_IS_INSTALLED -eq 0 ]; then
 fi
 
 if [ $APACHE_IS_INSTALLED -eq 0 ]; then
+    echo "Configuring HTTPD"
     # Remove apache vhost from default and create a new one
-    rm /etc/apache2/sites-enabled/$1.xip.io.conf > /dev/null 2>&1
-    rm /etc/apache2/sites-available/$1.xip.io.conf > /dev/null 2>&1
-    vhost -s $1.xip.io -d "$laravel_public_folder"
-    sudo service apache2 reload
+    sudo -E rm /etc/httpd/conf.d/$1.xip.io.conf > /dev/null 2>&1
+    sudo -E vhost -s $1.xip.io -d "$laravel_public_folder"
+    sudo service httpd reload
 fi

@@ -14,43 +14,59 @@ else
 	public_folder="$2"
 fi
 
-# Add repo for latest FULL stable Apache
-# (Required to remove conflicts with PHP PPA due to partial Apache upgrade within it)
-sudo add-apt-repository -y ppa:ondrej/apache2
+
+sudo rpm --import http://dag.wieers.com/rpm/packages/RPM-GPG-KEY.dag.txt
+sudo rpm -ivh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+
+
 
 # Update Again
-sudo apt-get update
+sudo yum update -y
 
 # Install Apache
-sudo apt-get install -y apache2-mpm-event libapache2-mod-fastcgi
+sudo yum install -y httpd mod_fastcgi mod_ssl
 
 echo ">>> Configuring Apache"
 
+
+
 # Apache Config
-sudo a2enmod rewrite actions ssl
-curl -L https://gist.githubusercontent.com/fideloper/2710970/raw/vhost.sh > vhost
+#sudo a2enmod rewrite actions ssl
+curl -L https://gist.githubusercontent.com/mikeyusc/10933456/raw/vhost.sh > vhost
 sudo chmod guo+x vhost
 sudo mv vhost /usr/local/bin
 
 # Create a virtualhost to start, with SSL certificate
 sudo vhost -s $1.xip.io -d $public_folder -p /etc/ssl/xip.io -c xip.io
 
+sudo mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
+
+sudo touch /etc/httpd/conf.d/ssl.conf
+
+sudo bash -c 'echo LoadModule ssl_module modules/mod_ssl.so >> /etc/httpd/conf.d/ssl.conf'
+sudo bash -c 'echo Listen 443 >> /etc/httpd/conf.d/ssl.conf'
+
+
 if [[ $PHP_IS_INSTALLED -eq 0 ]]; then
     # PHP Config for Apache
-    cat > /etc/apache2/conf-available/php5-fpm.conf << EOF
-    <IfModule mod_fastcgi.c>
-            AddHandler php5-fcgi .php
-            Action php5-fcgi /php5-fcgi
-            Alias /php5-fcgi /usr/lib/cgi-bin/php5-fcgi
-            FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi -socket /var/run/php5-fpm.sock -pass-header Authorization
-            <Directory /usr/lib/cgi-bin>
-                    Options ExecCGI FollowSymLinks
-                    SetHandler fastcgi-script
-                    Require all granted
-            </Directory>
-    </IfModule>
-EOF
-    sudo a2enconf php5-fpm
-fi
+sudo sed -i "s/FastCgiWrapper .*/FastCgiWrapper Off/" /etc/httpd/conf.d/fastcgi.conf
 
-sudo service apache2 restart
+sudo sed -i "s/listen = .*/listen = \/var\/run\/php5-fpm.sock/" /etc/php-fpm.d/www.conf
+
+sudo bash -c 'cat > /etc/httpd/conf.d/php5-fpm.conf << EOF
+<IfModule mod_fastcgi.c>
+DirectoryIndex index.php
+AddHandler php-fastcgi .php
+Action php-fastcgi /php5-fcgi/php-fpm
+ScriptAlias /php5-fcgi/ /var/www/php5-fcgi/
+FastCGIExternalServer /var/www/php5-fcgi/php-fpm -socket /var/run/php5-fpm.sock -pass-header Authorization
+</IfModule>
+
+EOF'
+
+sudo mkdir /var/www/php5-fcgi
+
+#    sudo a2enconf php5-fpm
+fi
+sudo service php-fpm restart
+sudo service httpd restart

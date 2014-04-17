@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 # Config Github Settings
-github_username = "fideloper"
+github_username = "downstairsgeek"
 github_repo     = "Vaprobash"
 github_branch   = "master"
 
@@ -14,7 +14,7 @@ github_branch   = "master"
 #   10.0.0.1    - 10.255.255.254
 #   172.16.0.1  - 172.31.255.254
 #   192.168.0.1 - 192.168.255.254
-server_ip             = "192.168.22.10"
+server_ip             = "192.168.33.10"
 server_memory         = "384" # MB
 server_timezone       = "UTC"
 
@@ -34,17 +34,16 @@ ruby_gems             = [        # List any Ruby Gems that you want to install
   #"compass",
 ]
 
-# HHVM Options
+# HHVM pptions
 hhvm_use_fastcgi      = "false"  # Use HHVM as FastCGI (over php-fpm)
 hhvm_over_php         = "false"  # Symlink HHVM to PHP, so calls to PHP run via HHVM
 
 # PHP Options
-php_version           = "latest" # Options: latest|previous|distributed   For 12.04. latest=5.5, previous=5.4, distributed=5.3
+php_version           = "latest" # Options: latest
 composer_packages     = [        # List any global Composer packages that you want to install
   #"phpunit/phpunit:4.0.*",
   #"codeception/codeception=*",
   #"phpspec/phpspec:2.0.*@dev",
-  #"squizlabs/php_codesniffer:1.5.*",
 ]
 public_folder         = "/vagrant" # If installing Symfony or Laravel, leave this blank to default to the framework public directory
 laravel_root_folder   = "/vagrant/laravel" # Where to install Laravel. Will `composer install` if a composer.json file exists
@@ -59,10 +58,12 @@ nodejs_packages       = [          # List any global NodeJS packages that you wa
 
 Vagrant.configure("2") do |config|
 
-  # Set server to Ubuntu 12.04
-  config.vm.box = "precise64"
+  # Set server to CentOS 6.5
+  config.vm.box = "chef/centos-6.5"
 
-  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  # config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  # If using VMWare Fusion Provider:
+  # config.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
 
   # Create a hostname, don't forget to put it to the `hosts` file
   # This will point to the server's default virtual host
@@ -96,9 +97,8 @@ Vagrant.configure("2") do |config|
   end
 
   # If using VMWare Fusion
-  config.vm.provider "vmware_fusion" do |vb, override|
-    override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
-    
+  config.vm.provider :vmware_fusion do |vb|
+
     # Set server memory
     vb.vmx["memsize"] = server_memory
 
@@ -142,7 +142,7 @@ Vagrant.configure("2") do |config|
   ##########
 
   # Provision Apache Base
-  # config.vm.provision "shell", path: "https://raw.github.com/#{github_username}/#{github_repo}/#{github_branch}/scripts/apache.sh", args: [server_ip, public_folder]
+config.vm.provision "shell", path: "https://raw.github.com/#{github_username}/#{github_repo}/#{github_branch}/scripts/apache.sh", args: [server_ip, public_folder]
 
   # Provision Nginx Base
   # config.vm.provision "shell", path: "https://raw.github.com/#{github_username}/#{github_repo}/#{github_branch}/scripts/nginx.sh", args: [server_ip, public_folder]
@@ -166,9 +166,6 @@ Vagrant.configure("2") do |config|
 
   # Provision SQLite
   # config.vm.provision "shell", path: "https://raw.github.com/#{github_username}/#{github_repo}/#{github_branch}/scripts/sqlite.sh"
-
-  # Provision RethinkDB
-  # config.vm.provision "shell", path: "https://raw.github.com/#{github_username}/#{github_repo}/#{github_branch}/scripts/rethinkdb.sh", args: pgsql_root_password
 
   # Provision Couchbase
   # config.vm.provision "shell", path: "https://raw.github.com/#{github_username}/#{github_repo}/#{github_branch}/scripts/couchbase.sh"
