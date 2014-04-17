@@ -53,9 +53,7 @@ Here's a quickstart screencast!
 >
 > Vagrant version 1.5 will have [more file sharing options](https://www.vagrantup.com/blog/feature-preview-vagrant-1-5-rsync.html) to explore as well!
 
-## Docs
 
-[View the site and extended docs.](http://fideloper.github.io/Vaprobash/index.html)
 
 ## What You Can Install
 >~~Strikethrough~~ packages have not been implemented for CentOS yet.
