@@ -39,11 +39,7 @@ Some further assumptions and self-imposed restrictions. If you find yourself nee
 $ vagrant up
 ```
 
-**Screencast**
 
-Here's a quickstart screencast!
-
-[<img src="https://secure-b.vimeocdn.com/ts/463/341/463341369_960.jpg" alt="Vaprobash Quickstart" style="max-width:100%"/>](http://vimeo.com/fideloper/vaprobash-quickstart)
 
 > <strong>Windows Users:</strong>
 >
